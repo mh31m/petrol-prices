@@ -9,7 +9,7 @@
 </head>
 <body>
     <div id="app">
-        <dashboard />
+        <dashboard :data="{{ json_encode($data) }}" />
     </div>
 </body>
 </html>

@@ -12,7 +12,5 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', 'App\Http\Controllers\Dashboard\IndexController@index');
+Route::get('/request_data', 'App\Http\Controllers\Dashboard\IndexController@requestData')->name('request_data');
