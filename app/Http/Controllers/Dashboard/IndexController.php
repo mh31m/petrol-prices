@@ -30,8 +30,9 @@ class IndexController extends Controller
             $this->data['location']['postal_code'] = $this->coordinates['postal_code'];
             $this->data['location']['place_name'] = $this->coordinates['place_name'];
             $this->getPetrolPrices();
-            if (isset($this->petrolPrices)) {
-                $this->data['petrol_stations'] = ($this->petrolPrices['stations']);
+            if (isset($this->petrolStations)) {
+                $this->createMapsLinks();
+                $this->data['petrol_stations'] = $this->petrolStations;
             }
         }
         return response()->json($this->data);
@@ -56,9 +57,20 @@ class IndexController extends Controller
     {
         $response = Http::get('https://creativecommons.tankerkoenig.de/json/list.php?lat=' . $this->coordinates['lat'] . '&lng=' . $this->coordinates['lng'] . '&rad=10&sort=dist&type=all&apikey=' . env('TANKERKOENIG_API_KEY'));
         if ($response->successful() && $response['status'] == 'ok') {
-            $this->petrolPrices = $response;
+            $this->petrolStations = $response['stations'];
         } else {
             $this->data['error_string'] = 'Fehler beim Laden der Tankstellen.';
+        }
+    }
+
+    private function createMapsLinks(): void
+    {
+        foreach ($this->petrolStations as &$petrolStation) {
+            if ($petrolStation['street'] && $petrolStation['houseNumber']) {
+                $petrolStation['mapsUrl'] = 'https://www.google.com/maps/search/?api=1&query=' . str_replace(" ", "+", strtolower(implode(" ", [$petrolStation['street'], $petrolStation['houseNumber'], $petrolStation['postCode'], $petrolStation['place']])));
+            } else {
+                $petrolStation['mapsUrl'] = 'https://www.google.com/maps/search/?api=1&query=' . str_replace(" ", "+", strtolower(implode(" ", [$petrolStation['name'], $petrolStation['place']])));
+            }
         }
     }
 }

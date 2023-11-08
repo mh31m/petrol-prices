@@ -7,7 +7,7 @@
         </div>
         <div class="row">
             <div class="col-12">
-                <form>
+                <form @submit.prevent="requestData()">
                     <div class="row">
                         <div class="col col-md-8">
                             <input type="text" class="form-control" id="postal-code" aria-describedby="postal-code-help" placeholder="Postleitzahl" v-model="postalCode">
@@ -29,14 +29,26 @@
                     {{ location.postal_code }} {{ location.place_name}}, {{ location.state }}
                     <h4 class="mt-5">Tankstellen</h4>
                     <template v-for="petrolStation in petrolStations">
-                        <div class="fw-bold">{{ petrolStation.brand }}, {{ petrolStation.place }}</div>
-                        <div class="">{{ petrolStation.street }} {{ petrolStation.houseNumber }}</div>
-                        <div>
-                            <span class="badge badge-e5 me-2">E5: {{ petrolStation.e5 }}</span>
-                            <span class="badge badge-e10 me-2">E10: {{ petrolStation.e10 }}</span>
-                            <span class="badge badge-diesel">Diesel: {{ petrolStation.diesel }}</span>
+                        <div class="petrol-station-row ps-2">
+                            <div class="row mt-2">
+                                <div class="col-12">
+                                    <div class="fw-bold">{{ petrolStation.brand ? petrolStation.brand : petrolStation.name }}, {{ petrolStation.place }}</div>
+                                    <div class="">{{ petrolStation.street }} {{ petrolStation.houseNumber }}</div>
+                                </div>
+                            </div>
+                            <div class="row pb-2">
+                                <div class="col-md-6">
+                                    <span class="badge badge-e5 me-2">E5: {{ petrolStation.e5 }}</span>
+                                    <span class="badge badge-e10 me-2">E10: {{ petrolStation.e10 }}</span>
+                                    <span class="badge badge-diesel">Diesel: {{ petrolStation.diesel }}</span>
+                                </div>
+                                <div class="col-md-6">
+                                        <MapPinIcon class="small-icon ms-2" /> {{ petrolStation.dist }}km
+                                        <ClockIcon class="small-icon ms-4" /> {{ petrolStation.isOpen ? 'geöffnet' : 'geschlossen' }}
+                                        <MapIcon class="small-icon ms-4" /> <a :href="petrolStation.mapsUrl" target="_blank">Maps</a>
+                                </div>
+                            </div>
                         </div>
-                        <hr>
                     </template>
                 </template>
                 <template v-else-if="isLoading">
@@ -51,7 +63,14 @@
 </template>
 
 <script>
+import { MapIcon, MapPinIcon } from '@heroicons/vue/24/solid'
+import { ClockIcon } from '@heroicons/vue/24/outline'
 export default ({
+    components: {
+        MapIcon,
+        MapPinIcon,
+        ClockIcon,
+    },
     props: ['data'],
     data() {
         return {
