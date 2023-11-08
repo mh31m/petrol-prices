@@ -6,15 +6,12 @@ body {
     border: 2px solid #9BABB8;
   }
 
-  .btn {
-    &-primary {
-      background-color: #AAC8A7;
-      border: 1px solid #85A389;
+  a {
+    text-decoration: none;
+    color: #1572A1;
 
-      &:hover {
-        background-color: #85A389;
-        border: 1px solid #85A389;
-      }
+    &:hover {
+      font-weight: bold;
     }
   }
 }

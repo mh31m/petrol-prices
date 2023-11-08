@@ -1,0 +1,8 @@
+.petrol-station-row {
+  border-top: 1px solid grey;
+
+  &:hover {
+    transition: all 0.2s ease-in;
+    background-color: #FDFAF6;
+  }
+}
