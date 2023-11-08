@@ -8,15 +8,7 @@
         <div class="row">
             <div class="col-12">
                 <form @submit.prevent="requestData()">
-                    <div class="row">
-                        <div class="col col-md-8">
-                            <input type="text" class="form-control" id="postal-code" aria-describedby="postal-code-help" placeholder="Postleitzahl" v-model="postalCode">
-                            <div id="postal-code-help" class="form-text">Bitte geben Sie eine Postleitzahl ein.</div>
-                        </div>
-                        <div class="col col-md-4">
-                            <a href="javascript:void(0)" class="btn btn-primary" @click="requestData()">Suchen</a>
-                        </div>
-                    </div>
+                    <search-form :searchParams="searchParams" v-on:requestData="requestData"/>
                 </form>
                 <hr>
             </div>
@@ -38,14 +30,19 @@
                             </div>
                             <div class="row pb-2">
                                 <div class="col-md-6">
-                                    <span class="badge badge-e5 me-2">E5: {{ petrolStation.e5 }}</span>
-                                    <span class="badge badge-e10 me-2">E10: {{ petrolStation.e10 }}</span>
-                                    <span class="badge badge-diesel">Diesel: {{ petrolStation.diesel }}</span>
+                                    <template v-if="searchParams['type'] == 'all'">
+                                        <span class="badge badge-e5 me-2" v-if="petrolStation.e5">E5: {{ petrolStation.e5 }}</span>
+                                        <span class="badge badge-e10 me-2" v-if="petrolStation.e10">E10: {{ petrolStation.e10 }}</span>
+                                        <span class="badge badge-diesel" v-if="petrolStation.diesel">Diesel: {{ petrolStation.diesel }}</span>
+                                    </template>
+                                    <template v-else>
+                                        <span class="badge badge-e5 me-2">{{ petrolNames[searchParams['type']] }}: {{ petrolStation.price }}</span>
+                                    </template>
                                 </div>
                                 <div class="col-md-6">
-                                        <MapPinIcon class="small-icon ms-2" /> {{ petrolStation.dist }}km
-                                        <ClockIcon class="small-icon ms-4" /> {{ petrolStation.isOpen ? 'geöffnet' : 'geschlossen' }}
-                                        <MapIcon class="small-icon ms-4" /> <a :href="petrolStation.mapsUrl" target="_blank">Maps</a>
+                                    <MapPinIcon class="small-icon ms-2" /> {{ petrolStation.dist }}km
+                                    <ClockIcon class="small-icon ms-4" /> {{ petrolStation.isOpen ? 'geöffnet' : 'geschlossen' }}
+                                    <MapIcon class="small-icon ms-4" /> <a :href="petrolStation.mapsUrl" target="_blank">Maps</a>
                                 </div>
                             </div>
                         </div>
@@ -65,20 +62,32 @@
 <script>
 import { MapIcon, MapPinIcon } from '@heroicons/vue/24/solid'
 import { ClockIcon } from '@heroicons/vue/24/outline'
+import SearchForm from "./search-form.vue";
 export default ({
     components: {
         MapIcon,
         MapPinIcon,
         ClockIcon,
+        SearchForm,
     },
     props: ['data'],
     data() {
         return {
-            postalCode: '',
             isLoading: false,
             errorString: null,
             petrolStations: [],
             location: null,
+            searchParams: {
+                'post_code': '',
+                'type': 'all',
+                'sort_by': 'dist',
+                'radius': '5',
+            },
+            petrolNames: {
+                'e5': 'E5',
+                'e10': 'E10',
+                'diesel': 'Diesel',
+            }
         }
     },
     methods: {
@@ -88,10 +97,12 @@ export default ({
             this.location = null;
             axios.get(this.data.request_data_url, {
                 params: {
-                    postal_code: this.postalCode,
+                    postal_code: this.searchParams['post_code'],
+                    type: this.searchParams['type'],
+                    sort_by: this.searchParams['sort_by'],
+                    radius: this.searchParams['radius'],
                 }
             }).then(response => {
-                    console.log(response.data);
                     this.location = response.data.location ? response.data.location : [];
                     this.petrolStations = response.data.petrol_stations ? response.data.petrol_stations : [];
                     this.errorString = response.data.error_string ? response.data.error_string : null;

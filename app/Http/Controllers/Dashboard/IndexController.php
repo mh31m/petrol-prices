@@ -16,7 +16,6 @@ class IndexController extends Controller
     {
         $data = [
             'request_data_url' => route('request_data'),
-            'loading' => ''
         ];
         return view('dashboard', compact('data'));
     }
@@ -24,7 +23,7 @@ class IndexController extends Controller
     public function requestData(Request $request): JsonResponse
     {
         $this->readRequestParameters($request);
-        $this->getCoordinatesOfPostalCode();
+        $this->getCoordinatesOfpostCode();
         if (isset($this->coordinates)) {
             $this->data['location']['state'] = $this->coordinates['state'];
             $this->data['location']['postal_code'] = $this->coordinates['postal_code'];
@@ -40,12 +39,15 @@ class IndexController extends Controller
 
     private function readRequestParameters($request): void
     {
-        $this->postalCode = $request->input('postal_code');
+        $this->postCode = $request->input('postal_code');
+        $this->type = $request->input('type');
+        $this->sortBy = $request->input('sort_by');
+        $this->radius = $request->input('radius');
     }
 
-    private function getCoordinatesOfPostalCode(): void
+    private function getCoordinatesOfpostCode(): void
     {
-        $response = Http::get('https://zip-api.eu/api/v1/info/DE-' . $this->postalCode);
+        $response = Http::get('https://zip-api.eu/api/v1/info/DE-' . $this->postCode);
         if ($response->successful()) {
             $this->coordinates = $response;
         } else {
@@ -55,7 +57,12 @@ class IndexController extends Controller
 
     private function getPetrolPrices(): void
     {
-        $response = Http::get('https://creativecommons.tankerkoenig.de/json/list.php?lat=' . $this->coordinates['lat'] . '&lng=' . $this->coordinates['lng'] . '&rad=10&sort=dist&type=all&apikey=' . env('TANKERKOENIG_API_KEY'));
+        if ($this->type != 'all') {
+            $petrolApiUrl = 'https://creativecommons.tankerkoenig.de/json/list.php?lat=' . $this->coordinates['lat'] . '&lng=' . $this->coordinates['lng'] . '&rad=' . $this->radius . '&sort=' . $this->sortBy . '&type=' . $this->type . '&apikey=' . env('TANKERKOENIG_API_KEY');
+        } else {
+            $petrolApiUrl = 'https://creativecommons.tankerkoenig.de/json/list.php?lat=' . $this->coordinates['lat'] . '&lng=' . $this->coordinates['lng'] . '&rad=' . $this->radius . '&sort=dist&type=all&apikey=' . env('TANKERKOENIG_API_KEY');
+        }
+        $response = Http::get($petrolApiUrl);
         if ($response->successful() && $response['status'] == 'ok') {
             $this->petrolStations = $response['stations'];
         } else {
