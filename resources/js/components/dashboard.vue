@@ -113,7 +113,6 @@ export default ({
                     this.location = response.data.location ? response.data.location : [];
                     this.petrolStations = response.data.petrol_stations ? response.data.petrol_stations : [];
                     this.errorString = response.data.error_string ? response.data.error_string : null;
-                    console.log(response.data.post_codes);
                     this.postCodes = response.data.post_codes;
                     this.isLoading = false;
                 })
