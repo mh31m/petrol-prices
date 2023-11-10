@@ -1,4 +1,7 @@
 .btn {
+  -webkit-box-shadow: 2px 2px 5px 1px rgba(110,110,110,0.94);
+  box-shadow: 2px 2px 5px 1px rgba(110,110,110,0.94);
+
   &-primary {
     background-color: #AAC8A7;
     border: 1px solid #85A389;
@@ -12,5 +15,12 @@
   font-weight: bold;
   &:hover {
     font-weight: bold;
+  }
+
+  &-dark {
+    background-color: #C4C1A4;
+    border: 1px solid #C4C1A4;
+    border-radius: 20px;
+    font-size: 10px;
   }
 }

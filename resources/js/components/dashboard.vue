@@ -10,13 +10,19 @@
                 <form @submit.prevent="requestData()">
                     <search-form :searchParams="searchParams" v-on:requestData="requestData"/>
                 </form>
+                <div class="row mt-4">
+                    <div class="col-12">
+                        Historie:
+                        <template v-for="postCode in postCodes"><button class="btn btn-dark me-2" @click="setPostCodeForRequest(postCode)">{{ postCode }}</button></template>
+                    </div>
+                </div>
                 <hr>
             </div>
         </div>
         <div class="row">
             <div class="col-12 mb-4">
-                <h2>Ergebnisse</h2>
                 <template v-if="!isLoading && petrolStations.length > 0">
+                    <h2>Ergebnisse</h2>
                     <h4 class="mt-5">Standort</h4>
                     {{ location.postal_code }} {{ location.place_name}}, {{ location.state }}
                     <h4 class="mt-5">Tankstellen</h4>
@@ -87,7 +93,8 @@ export default ({
                 'e5': 'E5',
                 'e10': 'E10',
                 'diesel': 'Diesel',
-            }
+            },
+            postCodes: this.data.post_codes,
         }
     },
     methods: {
@@ -106,12 +113,18 @@ export default ({
                     this.location = response.data.location ? response.data.location : [];
                     this.petrolStations = response.data.petrol_stations ? response.data.petrol_stations : [];
                     this.errorString = response.data.error_string ? response.data.error_string : null;
+                    console.log(response.data.post_codes);
+                    this.postCodes = response.data.post_codes;
                     this.isLoading = false;
                 })
                 .catch(error => {
                     this.errorString = 'Fehler beim Abrufen der Daten: ' + error;
                     this.isLoading = false;
                 });
+        },
+        setPostCodeForRequest(postCode) {
+            this.searchParams['post_code'] = postCode;
+            this.requestData();
         }
     }
 })
