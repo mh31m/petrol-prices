@@ -11,7 +11,7 @@
     <div class="row mt-4">
         <div class="col col-md-4">
             <label class="d-inline" for="type">Spritsorte</label>
-            <select class="form-select" id="type" aria-label="Spritsorte" v-model="searchParams['type']">
+            <select class="form-select" id="type" aria-label="Spritsorte" v-model="searchParams['type']" @change="requestData">
                 <option value="all">Alle</option>
                 <option value="e5">E5</option>
                 <option value="e10">E10</option>
@@ -26,7 +26,7 @@
                 </select>
             </template>
             <template v-else>
-                <select class="form-select" id="sort" aria-label="Sortierung" v-model="searchParams['sort_by']">
+                <select class="form-select" id="sort" aria-label="Sortierung" v-model="searchParams['sort_by']" @change="requestData">
                     <option value="dist">Entfernung</option>
                     <option value="price">Preis</option>
                 </select>
@@ -34,7 +34,7 @@
         </div>
         <div class="col col-md-4">
             <label for="sort">Umkreis</label>
-            <select class="form-select" id="radius" aria-label="Radius" v-model="searchParams['radius']">
+            <select class="form-select" id="radius" aria-label="Radius" v-model="searchParams['radius']" @change="requestData">
                 <option value="2.5">2,5 km</option>
                 <option value="5">5 km</option>
                 <option value="7.5">7,5 km</option>
